@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
 
-    private final static Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
+    private final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
 
     @PostMapping
     public User addUser(@RequestBody User user) {

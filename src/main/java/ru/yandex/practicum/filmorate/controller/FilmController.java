@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final static Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(FilmController.class);
+    private final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(FilmController.class);
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
