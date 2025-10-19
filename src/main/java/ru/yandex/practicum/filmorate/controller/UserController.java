@@ -43,6 +43,10 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
+        if (user.getId() == 0) {
+            log.info("не указан id пользователя");
+            throw new ValidationException("не указан id пользователя");
+        }
 
         return user;
     }
