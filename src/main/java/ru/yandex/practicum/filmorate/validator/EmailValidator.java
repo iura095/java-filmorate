@@ -17,7 +17,7 @@ public class EmailValidator {
             log.info("электронная почта должна содержать символ @");
             throw new ValidationException("электронная должна содержать символ @");
         }
-        if (!s.contains(" ")) {
+        if (s.contains(" ")) {
             log.info("электронная почта не должна содержать пробелы");
             throw new ValidationException("электронная почта не должна содержать пробелы");
         }
