@@ -1,55 +1,72 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ch.qos.logback.classic.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    private final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(UserController.class);
+    private final UserValidator userValidator = new UserValidator();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        if (user.getEmail() == null
-                || user.getEmail().isBlank()
-                || !user.getEmail().contains("@")) {
-            log.info("электронная почта не может быть пустой и должна содержать символ @");
-            throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
+        if (userValidator.newUserIsValid(user)) {
+            user.setId(getNextId());
+            users.put(user.getId(), user);
         }
-        if (user.getLogin() == null
-                || user.getLogin().isBlank()
-                || user.getLogin().contains(" ")) {
-            log.info("логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("логин не может быть пустым и содержать пробелы");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("дата рождения не может быть в будущем");
-            throw new ValidationException("дата рождения не может быть в будущем");
-        }
-
         return user;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-
-        return user;
+    public User updateUser(@RequestBody User newUser) {
+        if (users.containsKey(newUser.getId())) {
+            if (userValidator.updateUserIsValid(newUser)) {
+                User oldUser = users.get(newUser.getId());
+                updateUserFields(newUser, oldUser);
+            }
+        } else {
+            log.info("пользователя с таким id нет");
+            throw new ValidationException("пользователя с таким id нет");
+        }
+        return users.get(newUser.getId());
     }
 
     @GetMapping
     public Collection<User> getUsers() {
+        return users.values();
+    }
 
-        return new ArrayList<>();
+    private void updateUserFields(User newUser, User oldUser) {
+        if (newUser.getName() != null) {
+            oldUser.setName(newUser.getName());
+        }
+        if (newUser.getLogin() != null) {
+            oldUser.setLogin(newUser.getLogin());
+        }
+        if (newUser.getBirthday() != null) {
+            oldUser.setBirthday(newUser.getBirthday());
+        }
+        if (newUser.getEmail() != null) {
+            oldUser.setEmail(newUser.getEmail());
+        }
+    }
+
+    private int getNextId() {
+        int currentMaxId = users.keySet()
+                .stream()
+                .mapToInt(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 }

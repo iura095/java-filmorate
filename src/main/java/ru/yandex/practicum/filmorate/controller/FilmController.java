@@ -1,52 +1,72 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ch.qos.logback.classic.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
 
-    private final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(FilmController.class);
+    private final FilmValidator filmValidator = new FilmValidator();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.info("название не может быть пустым");
-            throw new ValidationException("название не может быть пустым");
+        if (filmValidator.newFilmIsValid(film)) {
+            film.setId(getNextId());
+            films.put(film.getId(), film);
         }
-        if (film.getDescription().length() > 200) {
-            log.info("максимальная длина описания — 200 символов");
-            throw new ValidationException("максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate().isBefore((LocalDate.of(1985, 12, 28)))) {
-            log.info("дата релиза — не раньше 28 декабря 1895 года");
-            throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration().isNegative()) {
-            log.info("продолжительность фильма должна быть положительным числом");
-            throw new ValidationException("продолжительность фильма должна быть положительным числом");
-        }
-
         return film;
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
-
-        return film;
+    public Film updateFilm(@RequestBody Film newFilm) {
+        if (filmValidator.updateFilmIsValid(newFilm)) {
+            if (films.containsKey(newFilm.getId())) {
+                Film oldFilm = films.get(newFilm.getId());
+                updateFilmFields(newFilm, oldFilm);
+            } else {
+                log.info("фильма с таким id нет");
+                throw new ValidationException("фильма с таким id нет");
+            }
+        }
+        return films.get(newFilm.getId());
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
+        return films.values();
+    }
 
-        return new ArrayList<>();
+    private void updateFilmFields(Film newFilm, Film oldFilm) {
+        if (newFilm.getName() != null && !newFilm.getName().isBlank()) {
+            oldFilm.setName(newFilm.getName());
+        }
+        if (newFilm.getDescription() != null && !newFilm.getDescription().isBlank()) {
+            oldFilm.setDescription(newFilm.getDescription());
+        }
+        if (newFilm.getReleaseDate() != null) {
+            oldFilm.setReleaseDate(newFilm.getReleaseDate());
+        }
+        if (newFilm.getDuration() != null) {
+            oldFilm.setDuration(newFilm.getDuration());
+        }
+    }
+
+    private int getNextId() {
+        int currentMaxId = films.keySet()
+                .stream()
+                .mapToInt(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 }
