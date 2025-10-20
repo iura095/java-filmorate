@@ -23,7 +23,7 @@ class FilmControllerTest {
 
 
     @Test
-    void nameValidation() {
+    void addNameValidation() {
         assertEquals("Inception", filmController.addFilm(film).getName());
         film.setName("");
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
@@ -32,13 +32,18 @@ class FilmControllerTest {
     }
 
     @Test
-    void descriptionValidation() {
+    void addDescriptionLess200SymbolsValidation() {
         assertEquals("Good movie", filmController.addFilm(film).getDescription());
         film.setDescription("It is used to display fonts, generate text for testing, and other purposes. " +
                 "The characters are spread out evenly so the reader's attention is focused on the layout instead" +
                 " of the content. Test text)))");
         assertDoesNotThrow(() -> filmController.addFilm(film));
         assertEquals(200, filmController.addFilm(film).getDescription().length());
+    }
+
+    @Test
+    void addDescriptionMore200SymbolsValidation() {
+        assertEquals("Good movie", filmController.addFilm(film).getDescription());
         film.setDescription("It is used to display fonts, generate text for testing, and other purposes. " +
                 "The characters are spread out evenly so the reader's attention is focused on the layout instead" +
                 " of the content. Test text))))");
@@ -47,7 +52,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void releaseDateValidate() {
+    void addReleaseDateValidate() {
         film.setReleaseDate((LocalDate.of(1985, 12, 28)));
         assertDoesNotThrow(() -> filmController.addFilm(film));
         film.setReleaseDate((LocalDate.of(1985, 12, 27)));
@@ -55,10 +60,11 @@ class FilmControllerTest {
     }
 
     @Test
-    void durationValidate() {
+    void addDurationValidate() {
         film.setDuration(Duration.ZERO);
         assertDoesNotThrow(() -> filmController.addFilm(film));
         film.setDuration(Duration.ofMinutes(-1));
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
+
 }
