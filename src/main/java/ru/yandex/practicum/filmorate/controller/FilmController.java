@@ -33,9 +33,8 @@ public class FilmController {
     public Film updateFilm(@RequestBody Film film) {
         if (filmValidator.filmIsValid(film)) {
             if (films.containsKey(film.getId())) {
-                Film oldFilm = films.get(film.getId());
-                updateFilmFields(film, oldFilm);
-                log.info("фильм с id = {} обновлён", oldFilm.getId());
+                films.put(film.getId(), film);
+                log.info("фильм с id = {} обновлён", film.getId());
             } else {
                 log.info("фильма с таким id нет");
                 throw new NotFoundException("фильма с таким id нет");
@@ -47,20 +46,5 @@ public class FilmController {
     @GetMapping
     public Collection<Film> getFilms() {
         return films.values();
-    }
-
-    private void updateFilmFields(Film newFilm, Film oldFilm) {
-        if (newFilm.getName() != null && !newFilm.getName().isBlank()) {
-            oldFilm.setName(newFilm.getName());
-        }
-        if (newFilm.getDescription() != null && !newFilm.getDescription().isBlank()) {
-            oldFilm.setDescription(newFilm.getDescription());
-        }
-        if (newFilm.getReleaseDate() != null) {
-            oldFilm.setReleaseDate(newFilm.getReleaseDate());
-        }
-        if (newFilm.getDuration() != null) {
-            oldFilm.setDuration(newFilm.getDuration());
-        }
     }
 }
