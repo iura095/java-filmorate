@@ -13,26 +13,7 @@ public class FilmValidator {
 
     private static final int DESC_MAX_LENGTH = 200;
 
-    public boolean updateFilmIsValid(Film film) {
-        if (film.getId() == 0) {
-            log.info("id фильма должен быть указан");
-            throw new ValidationException("id фильма должен быть указан");
-        }
-        if ((film.getName() == null || film.getName().isBlank())
-                && (film.getDescription() == null || film.getDescription().isBlank())
-                && film.getReleaseDate() == null
-                && film.getDuration() == null) {
-            log.info("нет полей для обновления");
-            throw new ValidationException("нет полей для обновления");
-        }
-        if (film.getDescription() != null && film.getDescription().length() > DESC_MAX_LENGTH) {
-            log.info("максимальная длина описания = 200 символов");
-            throw new ValidationException("максимальная длина описания — 200 символов");
-        }
-        return true;
-    }
-
-    public boolean newFilmIsValid(Film film) {
+    public boolean filmIsValid(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             log.info("название не может быть пустым");
             throw new ValidationException("название не может быть пустым");

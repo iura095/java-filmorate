@@ -21,7 +21,7 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (filmValidator.newFilmIsValid(film)) {
+        if (filmValidator.filmIsValid(film)) {
             film.setId(++idCount);
             films.put(film.getId(), film);
             log.info("фильм с id = {} добавлен", idCount);
@@ -30,18 +30,18 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film newFilm) {
-        if (filmValidator.updateFilmIsValid(newFilm)) {
-            if (films.containsKey(newFilm.getId())) {
-                Film oldFilm = films.get(newFilm.getId());
-                updateFilmFields(newFilm, oldFilm);
+    public Film updateFilm(@RequestBody Film film) {
+        if (filmValidator.filmIsValid(film)) {
+            if (films.containsKey(film.getId())) {
+                Film oldFilm = films.get(film.getId());
+                updateFilmFields(film, oldFilm);
                 log.info("фильм с id = {} обновлён", oldFilm.getId());
             } else {
                 log.info("фильма с таким id нет");
                 throw new NotFoundException("фильма с таким id нет");
             }
         }
-        return films.get(newFilm.getId());
+        return film;
     }
 
     @GetMapping
