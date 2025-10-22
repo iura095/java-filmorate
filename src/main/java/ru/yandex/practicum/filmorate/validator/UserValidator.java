@@ -13,21 +13,7 @@ public class UserValidator {
 
     private final EmailValidator emailValidator = new EmailValidator();
 
-    public boolean updateUserIsValid(User user) {
-        if (emptyFieldCheck(user.getEmail())
-                && emptyFieldCheck(user.getLogin())
-                && emptyFieldCheck(user.getName())
-                && user.getBirthday() == null) {
-            log.info("нет полей для обновления");
-            throw new ValidationException("нет полей для обновления");
-        }
-        if (!nullBlankSpaceCheck(user.getEmail())) {
-            emailValidator.validate(user.getEmail());
-        }
-        return true;
-    }
-
-    public boolean newUserIsValid(User user) {
+    public boolean UserIsValid(User user) {
         emailValidator.validate(user.getEmail());
         if (nullBlankSpaceCheck(user.getLogin()) || user.getLogin().contains(" ")) {
             log.info("логин не может быть пустым и содержать пробелы");

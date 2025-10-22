@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
@@ -15,58 +15,36 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
+    private int idCount = 0;
     private final UserValidator userValidator = new UserValidator();
     private final Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        if (userValidator.newUserIsValid(user)) {
-            user.setId(getNextId());
+        if (userValidator.UserIsValid(user)) {
+            user.setId(++idCount);
             users.put(user.getId(), user);
+            log.info("пользователь id = {} добавлен", idCount);
         }
         return user;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User newUser) {
-        if (users.containsKey(newUser.getId())) {
-            if (userValidator.updateUserIsValid(newUser)) {
-                User oldUser = users.get(newUser.getId());
-                updateUserFields(newUser, oldUser);
+    public User updateUser(@RequestBody User user) {
+        if (users.containsKey(user.getId())) {
+            if (userValidator.UserIsValid(user)) {
+                users.put(user.getId(), user);
+                log.info("пользователь id = {} обновлён", user.getId());
             }
         } else {
             log.info("пользователя с таким id нет");
-            throw new ValidationException("пользователя с таким id нет");
+            throw new NotFoundException("пользователя с таким id нет");
         }
-        return users.get(newUser.getId());
+        return user;
     }
 
     @GetMapping
     public Collection<User> getUsers() {
         return users.values();
-    }
-
-    private void updateUserFields(User newUser, User oldUser) {
-        if (newUser.getName() != null) {
-            oldUser.setName(newUser.getName());
-        }
-        if (newUser.getLogin() != null) {
-            oldUser.setLogin(newUser.getLogin());
-        }
-        if (newUser.getBirthday() != null) {
-            oldUser.setBirthday(newUser.getBirthday());
-        }
-        if (newUser.getEmail() != null) {
-            oldUser.setEmail(newUser.getEmail());
-        }
-    }
-
-    private int getNextId() {
-        int currentMaxId = users.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }

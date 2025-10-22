@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class FilmValidator {
 
-    private final int descMaxLength = 200;
+    private static final int DESC_MAX_LENGTH = 200;
 
     public boolean updateFilmIsValid(Film film) {
         if (film.getId() == 0) {
@@ -25,7 +25,7 @@ public class FilmValidator {
             log.info("нет полей для обновления");
             throw new ValidationException("нет полей для обновления");
         }
-        if (film.getDescription() != null && film.getDescription().length() > descMaxLength) {
+        if (film.getDescription() != null && film.getDescription().length() > DESC_MAX_LENGTH) {
             log.info("максимальная длина описания = 200 символов");
             throw new ValidationException("максимальная длина описания — 200 символов");
         }
@@ -37,7 +37,7 @@ public class FilmValidator {
             log.info("название не может быть пустым");
             throw new ValidationException("название не может быть пустым");
         }
-        if (film.getDescription().length() > descMaxLength) {
+        if (film.getDescription().length() > DESC_MAX_LENGTH) {
             log.info("максимальная длина описания — 200 символов");
             throw new ValidationException("максимальная длина описания — 200 символов");
         }

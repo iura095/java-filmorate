@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -15,14 +15,16 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
 
+    private int idCount = 0;
     private final FilmValidator filmValidator = new FilmValidator();
     private final Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
         if (filmValidator.newFilmIsValid(film)) {
-            film.setId(getNextId());
+            film.setId(++idCount);
             films.put(film.getId(), film);
+            log.info("фильм с id = {} добавлен", idCount);
         }
         return film;
     }
@@ -33,9 +35,10 @@ public class FilmController {
             if (films.containsKey(newFilm.getId())) {
                 Film oldFilm = films.get(newFilm.getId());
                 updateFilmFields(newFilm, oldFilm);
+                log.info("фильм с id = {} обновлён", oldFilm.getId());
             } else {
                 log.info("фильма с таким id нет");
-                throw new ValidationException("фильма с таким id нет");
+                throw new NotFoundException("фильма с таким id нет");
             }
         }
         return films.get(newFilm.getId());
@@ -59,14 +62,5 @@ public class FilmController {
         if (newFilm.getDuration() != null) {
             oldFilm.setDuration(newFilm.getDuration());
         }
-    }
-
-    private int getNextId() {
-        int currentMaxId = films.keySet()
-                .stream()
-                .mapToInt(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }
