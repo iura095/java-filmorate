@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
 @Slf4j
@@ -22,11 +23,11 @@ public class FilmValidator {
             log.info("максимальная длина описания — 200 символов");
             throw new ValidationException("максимальная длина описания — 200 символов");
         }
-        if (film.getReleaseDate().isBefore((LocalDate.of(1985, 12, 28)))) {
+        if (film.getReleaseDate().isBefore((LocalDate.of(1970, 12, 28)))) {
             log.info("дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("дата релиза — не раньше 28 декабря 1895 года");
         }
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration().compareTo(Duration.ZERO) < 1) {
             log.info("продолжительность фильма должна быть положительным числом");
             throw new ValidationException("продолжительность фильма должна быть положительным числом");
         }
