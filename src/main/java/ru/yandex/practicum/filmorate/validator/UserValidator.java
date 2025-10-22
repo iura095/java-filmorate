@@ -13,7 +13,7 @@ public class UserValidator {
 
     private final EmailValidator emailValidator = new EmailValidator();
 
-    public boolean UserIsValid(User user) {
+    public boolean userIsValid(User user) {
         emailValidator.validate(user.getEmail());
         if (nullBlankSpaceCheck(user.getLogin()) || user.getLogin().contains(" ")) {
             log.info("логин не может быть пустым и содержать пробелы");

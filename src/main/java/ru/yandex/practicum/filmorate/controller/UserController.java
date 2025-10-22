@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping
     public User addUser(@RequestBody User user) {
-        if (userValidator.UserIsValid(user)) {
+        if (userValidator.userIsValid(user)) {
             user.setId(++idCount);
             users.put(user.getId(), user);
             log.info("пользователь id = {} добавлен", idCount);
@@ -32,7 +32,7 @@ public class UserController {
     @PutMapping
     public User updateUser(@RequestBody User user) {
         if (users.containsKey(user.getId())) {
-            if (userValidator.UserIsValid(user)) {
+            if (userValidator.userIsValid(user)) {
                 users.put(user.getId(), user);
                 log.info("пользователь id = {} обновлён", user.getId());
             }
