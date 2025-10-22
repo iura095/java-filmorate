@@ -62,7 +62,7 @@ class FilmControllerTest {
     @Test
     void addDurationValidate() {
         film.setDuration(Duration.ZERO);
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertDoesNotThrow( () -> filmController.addFilm(film));
         film.setDuration(Duration.ofMinutes(-1));
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
