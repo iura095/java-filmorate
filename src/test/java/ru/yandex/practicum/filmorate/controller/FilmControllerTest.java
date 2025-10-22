@@ -53,9 +53,9 @@ class FilmControllerTest {
 
     @Test
     void addReleaseDateValidate() {
-        film.setReleaseDate((LocalDate.of(1985, 12, 28)));
+        film.setReleaseDate((LocalDate.of(1895, 12, 28)));
         assertDoesNotThrow(() -> filmController.addFilm(film));
-        film.setReleaseDate((LocalDate.of(1970, 12, 27)));
+        film.setReleaseDate((LocalDate.of(1895, 12, 27)));
         assertThrows(ValidationException.class, () -> filmController.addFilm(film));
     }
 
