@@ -10,7 +10,7 @@ public class DurationSerializer extends JsonSerializer<Duration> {
     @Override
     public void serialize(Duration duration, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (duration != null) {
-            jsonGenerator.writeNumber(duration.toMinutes());
+            jsonGenerator.writeNumber(duration.toSeconds());
         } else {
             jsonGenerator.writeNull();
         }
